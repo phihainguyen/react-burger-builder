@@ -84,36 +84,13 @@ class BurgerBuilder extends Component {
 		});
 	};
 	purchaseContinueHandler = () => {
-		// alert(`Your total is: $${this.state.totalPrice.toFixed(2)}`);
-		//here we set loading icon to true at inital part before the post request
-		this.setState({
-			loading: true
-		});
-		const order = {
-			ingredients: this.state.ingredients,
-			price: this.state.totalPrice,
-			customer: {
-				name: 'Phil Tom',
-				address: {
-					street: 'testSt 21',
-					zipcode: 8989,
-					country: 'USA'
-				},
-				email: 'pjsd@fi.com'
-			}
-		};
-		//we will then set the loading now to false once the post request has completed and sent back the response same with the catch error because we dont want to load during that time
-		//below we are also setting purchasing in our state to false since we also want to close our modal after we click the order button
-		axios
-			.post('/orders.json', order)
-			.then((resp) => {
-				console.log(resp);
-				this.setState({ loading: false, purchasing: false });
-			})
-			.catch((error) => {
-				console.error(error);
-				this.setState({ loading: false, purchasing: false });
-			});
+		const queryParams = [];
+		for (let i in this.state.ingredients) {
+			queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+		}
+		queryParams.push('price=' + this.state.totalPrice);
+		const queryString = queryParams.join('&');
+		this.props.history.push({ pathname: '/checkout', search: '?' + queryString });
 	};
 	render() {
 		const disabledInfo = {
