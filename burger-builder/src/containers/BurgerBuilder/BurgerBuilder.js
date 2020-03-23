@@ -41,6 +41,7 @@ class BurgerBuilder extends Component {
 		});
 	};
 	purchaseContinueHandler = () => {
+		this.props.onInitPurchase();
 		this.props.history.push('/checkout');
 	};
 	render() {
@@ -104,7 +105,8 @@ const mapDispatchToProps = (dispatch) => {
 	return {
 		addIngredient: (ingName) => dispatch(burgerBuilderActions.addIngredient(ingName)),
 		removeIngredient: (ingName) => dispatch(burgerBuilderActions.removeIngredient(ingName)),
-		initIngredients: () => dispatch(burgerBuilderActions.initIngredients())
+		initIngredients: () => dispatch(burgerBuilderActions.initIngredients()),
+		onInitPurchase: () => dispatch(burgerBuilderActions.purchaseInit())
 	};
 };
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(BurgerBuilder, axios));
