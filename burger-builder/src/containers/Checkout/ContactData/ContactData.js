@@ -4,6 +4,8 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import classes from './ContactData.module.css';
 import axios from '../../../axios-order';
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+import * as actions from '../../../store/action/index';
 
 import { connect } from 'react-redux';
 class ContactData extends Component {
@@ -64,8 +66,7 @@ class ContactData extends Component {
 				value: '',
 				valid: true
 			}
-		},
-		loading: false
+		}
 	};
 	orderHandler = (event) => {
 		event.preventDefault();
@@ -76,27 +77,15 @@ class ContactData extends Component {
 		for (let formElementIdentifier in this.state.orderForm) {
 			formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
 		}
-		this.setState({
-			loading: true
-		});
+
 		const order = {
 			ingredients: this.props.ings,
 			price: this.props.price,
 			orderData: formData
 		};
+		this.props.onOrderBurger(order);
 		//we will then set the loading now to false once the post request has completed and sent back the response same with the catch error because we dont want to load during that time
 		//below we are also setting purchasing in our state to false since we also want to close our modal after we click the order button
-		axios
-			.post('/orders.json', order)
-			.then((resp) => {
-				// console.log(resp);
-				this.setState({ loading: false });
-				this.props.history.push('/');
-			})
-			.catch((error) => {
-				console.error(error);
-				this.setState({ loading: false });
-			});
 	};
 	// checkValidity(value, rules) {
 	// 	let isValid = false;
@@ -143,7 +132,7 @@ class ContactData extends Component {
 				</Button>
 			</form>
 		);
-		if (this.state.loading) {
+		if (this.props.loading) {
 			form = <Spinner />;
 		}
 		return (
@@ -158,7 +147,13 @@ class ContactData extends Component {
 const mapStateToProps = (state) => {
 	return {
 		ings: state.ingredients,
-		price: state.totalPrice
+		price: state.totalPrice,
+		loading: state.loading
 	};
 };
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = (dispatch) => {
+	return {
+		onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+	};
+};
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
